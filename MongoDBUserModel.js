@@ -57,18 +57,23 @@ UserModel.findUser = function(email, callback) {
     }
 }
 
-UserModel.updateSecret = function(_id, secret, callback) {
+UserModel.updateSecret = function(email, secret, callback) {
     User.findOne({ email }, function(err, result) {
         if (err) {
             callback(false, "Could not find the user")
         } else {
-            User.update({ _id }, { secret }, {}, function(err, doc) {
-                if (err) {
-                    callback(false, "Could not update the user's secret")
-                } else {
-                    callback(true)
-                }
-            })
+            User.updateOne(
+                { email },
+                { $set: { secret } },
+                { upsert: true }, // add document with req.body._id if not exists
+                function(err, doc) {
+                    if (err) {
+                        callback(false, "Could not update the user's secret")
+                    } else {
+                        callback(true)
+                    }
+                },
+            )
         }
     })
 }
