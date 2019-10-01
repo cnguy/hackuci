@@ -110,13 +110,11 @@ app.put("/user/putSecret", middlewares.checkToken, function(req, res) {
 // Guess another user's secret text field.
 app.get("/user/guessSecret", middlewares.checkToken, function(req, res) {
     const { email, secret } = req.body
-    User.getSecret(email, secret, function(
-        getSecretSuccess,
-        errMsg,
-        successMsg,
-    ) {
+    User.getSecret(email, secret, function(getSecretSuccess, errMsg, result) {
         if (getSecretSuccess) {
-            return res.status(200).send(successMsg)
+            return res
+                .status(200)
+                .send(result === secret ? "True" : "False")
         } else {
             return res.status(404).send({ message: errMsg })
         }

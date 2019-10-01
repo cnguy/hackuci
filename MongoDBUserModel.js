@@ -63,34 +63,39 @@ UserModel.getSecret = function(email, secret, callback) {
         if (err || !result || (result && !result.secret)) {
             callback(false, "Could not find user or user does not have secret")
         } else {
-            if (result.secret === secret) {
-                callback(true, null, "True")
-            } else {
-                callback(true, null, "False")
-            }
+            callback(true, null, result.secret)
         }
     })
 }
 
 UserModel.updateSecret = function(email, secret, callback) {
-    User.findOne({ email }, function(err, result) {
-        if (err) {
-            callback(false, "Could not find the user")
-        } else {
-            User.updateOne(
-                { email },
-                { $set: { secret } },
-                { upsert: true }, // add secret if it does not exist
-                function(err, doc) {
-                    if (err) {
-                        callback(false, "Could not update the user's secret")
-                    } else {
-                        callback(true)
-                    }
-                },
-            )
-        }
-    })
+    if (!email || !validator.isEmail(email)) {
+        callback(false, "Email is ill-formed")
+    } else if (!secret) {
+        callback(false, "Secret is ill-formed")
+    } else {
+        User.findOne({ email }, function(err, result) {
+            if (err) {
+                callback(false, "Could not find the user")
+            } else {
+                User.updateOne(
+                    { email },
+                    { $set: { secret } },
+                    { upsert: true }, // add secret if it does not exist
+                    function(err, doc) {
+                        if (err) {
+                            callback(
+                                false,
+                                "Could not update the user's secret",
+                            )
+                        } else {
+                            callback(true)
+                        }
+                    },
+                )
+            }
+        })
+    }
 }
 
 module.exports = UserModel
