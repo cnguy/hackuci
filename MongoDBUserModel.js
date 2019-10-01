@@ -57,6 +57,22 @@ UserModel.findUser = function(email, callback) {
     }
 }
 
+UserModel.getSecret = function(email, secret, callback) {
+    User.findOne({ email }, function(err, result) {
+        // Technically, I could search for the email and secret.
+        console.log(err, result)
+        if (err || !result || (result && !result.secret)) {
+            callback(false, "Could not find user or user does not have secret")
+        } else {
+            if (result.secret === secret) {
+                callback(true, null, "True")
+            } else {
+                callback(true, null, "False")
+            }
+        }
+    })
+}
+
 UserModel.updateSecret = function(email, secret, callback) {
     User.findOne({ email }, function(err, result) {
         if (err) {
@@ -65,7 +81,7 @@ UserModel.updateSecret = function(email, secret, callback) {
             User.updateOne(
                 { email },
                 { $set: { secret } },
-                { upsert: true }, // add document with req.body._id if not exists
+                { upsert: true }, // add secret if it does not exist
                 function(err, doc) {
                     if (err) {
                         callback(false, "Could not update the user's secret")
