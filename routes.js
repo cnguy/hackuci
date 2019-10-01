@@ -67,7 +67,7 @@ app.post("/user/login", function(req, res) {
     }
     bcrypt.hash(password, saltRounds, function(err, hash) {
         if (err) {
-            return res.status(500).send("Internal Server Error") // Don't mention hashing
+            return res.status(403).send("Internal Server Error") // Don't mention hashing
         } else {
             User.findUser(email, function(loginSuccess, errMsg, user) {
                 if (!loginSuccess)
@@ -96,7 +96,7 @@ app.post("/user/login", function(req, res) {
 })
 
 // As a user, store a secret.
-app.put("/user/addSecret", middlewares.checkToken, function(req, res) {
+app.put("/user/putSecret", middlewares.checkToken, function(req, res) {
     const { secret } = req.body
     User.updateSecret(req.decoded.id, secret, function(updateSuccess, errMsg) {
         if (!updateSuccess) {

@@ -60,7 +60,6 @@ UserModel.findUser = function(email, callback) {
 UserModel.getSecret = function(email, secret, callback) {
     User.findOne({ email }, function(err, result) {
         // Technically, I could search for the email and secret.
-        console.log(err, result)
         if (err || !result || (result && !result.secret)) {
             callback(false, "Could not find user or user does not have secret")
         } else {
